@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: ssh://git@github.com:yamenalahlas/k8s_playground.git
+    repoURL: https://github.com/yamenalahlas/k8s_playground.git
     targetRevision: main
     path: manifests
   destination:
