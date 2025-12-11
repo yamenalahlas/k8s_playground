@@ -13,28 +13,15 @@ spec:
       labels:
         app: pimcore-nginx
     spec:
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: pimcore-nginx-config
       containers:
         - name: nginx
           image: nginx:stable-alpine
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
           ports:
             - containerPort: 80
-          volumeMounts:
-            - name: config
-              mountPath: /etc/nginx/conf.d
-      volumes:
-        - name: config
-          configMap:
-            name: pimcore-nginx-config
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: pimcore-nginx
-  namespace: pimcore-dev
-spec:
-  type: ClusterIP
-  selector:
-    app: pimcore-nginx
-  ports:
-    - port: 80
-      targetPort: 80
