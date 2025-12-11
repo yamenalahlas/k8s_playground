@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pimcore-nginx
+  namespace: pimcore-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pimcore-nginx
+  template:
+    metadata:
+      labels:
+        app: pimcore-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:stable-alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/conf.d
+      volumes:
+        - name: config
+          configMap:
+            name: pimcore-nginx-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pimcore-nginx
+  namespace: pimcore-dev
+spec:
+  type: ClusterIP
+  selector:
+    app: pimcore-nginx
+  ports:
+    - port: 80
+      targetPort: 80
