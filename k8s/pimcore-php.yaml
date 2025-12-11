@@ -17,7 +17,7 @@ spec:
         - name: pimcore-php
           image: pimcore-app:local
           imagePullPolicy: IfNotPresent
-          command: ["/usr/local/bin/php-fpm"]   # nicht mehr "sleep infinity"
+          command: ["/usr/local/sbin/php-fpm"]
           env:
             - name: PIMCORE_INSTALL_MYSQL_USERNAME
               valueFrom:
