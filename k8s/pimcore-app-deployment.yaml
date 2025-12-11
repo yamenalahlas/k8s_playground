@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pimcore-php-debug
+  namespace: pimcore-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pimcore-php
+  template:
+    metadata:
+      labels:
+        app: pimcore-php
+    spec:
+      containers:
+        - name: pimcore-php
+          image: pimcore-app:local
+          imagePullPolicy: IfNotPresent
+          # Vorläufig: Pod einfach laufen lassen
+          command: ["sleep", "infinity"]

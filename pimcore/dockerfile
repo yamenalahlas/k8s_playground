@@ -1,0 +1,7 @@
+FROM pimcore/pimcore:php8.3-debug-latest
+
+# Arbeitsverzeichnis wie im Compose
+WORKDIR /var/www/html
+
+# Alles ins Image kopieren (können wir später verfeinern)
+COPY . /var/www/html

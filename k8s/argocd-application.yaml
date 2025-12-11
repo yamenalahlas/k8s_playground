@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pimcore
+  namespace: argocd          # da läuft ArgoCD normalerweise
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:yamenalahlas/k8s_playground.git   # <--- anpassen
+    targetRevision: main                                 # <--- ggf. branch ändern
+    path: k8s                                            # Ordner mit deinen YAMLs
+  destination:
+    server: https://kubernetes.default.svc               # Argo im selben Cluster
+    namespace: pimcore-dev                               # unser Namespace von eben
+  syncPolicy: {}                                         # noch KEIN Auto-Sync
