@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pimcore-php
+  namespace: pimcore-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pimcore-php
+  template:
+    metadata:
+      labels:
+        app: pimcore-php
+    spec:
+      containers:
+        - name: pimcore-php
+          image: pimcore-app:local
+          imagePullPolicy: IfNotPresent
+          command: ["/usr/local/bin/php-fpm"]   # nicht mehr "sleep infinity"
+          env:
+            - name: PIMCORE_INSTALL_MYSQL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: pimcore-db-secret
+                  key: MYSQL_USER
+            - name: PIMCORE_INSTALL_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pimcore-db-secret
+                  key: MYSQL_PASSWORD
+            - name: PIMCORE_INSTALL_MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: pimcore-db-secret
+                  key: MYSQL_DATABASE
+            - name: PIMCORE_INSTALL_MYSQL_HOST_SOCKET
+              value: pimcore-db
+            - name: PIMCORE_INSTALL_MYSQL_PORT
+              value: "3306"
+          ports:
+            - containerPort: 9000
+              name: php-fpm
