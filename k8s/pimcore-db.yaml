@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pimcore-db-secret
+  namespace: pimcore-dev
+type: Opaque
+stringData:
+  MYSQL_ROOT_PASSWORD: ROOT
+  MYSQL_DATABASE: pimcore
+  MYSQL_USER: pimcore
+  MYSQL_PASSWORD: pimcore
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pimcore-db-pvc
+  namespace: pimcore-dev
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pimcore-db
+  namespace: pimcore-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pimcore-db
+  template:
+    metadata:
+      labels:
+        app: pimcore-db
+    spec:
+      containers:
+        - name: mariadb
+          image: mariadb:10.11
+          args:
+            - mysqld
+            - --character-set-server=utf8mb4
+            - --collation-server=utf8mb4_unicode_520_ci
+            - --innodb-file-per-table=1
+          envFrom:
+            - secretRef:
+                name: pimcore-db-secret
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - "mysqladmin ping -h 127.0.0.1 -p${MYSQL_ROOT_PASSWORD} || exit 1"
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - "mysqladmin ping -h 127.0.0.1 -p${MYSQL_ROOT_PASSWORD} || exit 1"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: pimcore-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pimcore-db
+  namespace: pimcore-dev
+spec:
+  selector:
+    app: pimcore-db
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306
